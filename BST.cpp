@@ -50,7 +50,14 @@ void removeNode(int number, BinaryNode *& root) {
       int tempValue = root->getValue();
       root->setValue(root->getRight()->getValue());
       root->getRight()->setValue(tempValue);
-      removeNode(number, root->getRight())
+      removeNode(number, root->getRight());
+    }
+    //if there is a left child but no right
+    else if(root->getRight() == NULL) {
+      int tempValue = root->getValue();
+      root->setvalue(root->getLeft()->getValue());
+      root->getleft()->setValue(rootValue);
+      removeNode(number, root->getLeft());
     }
   }
 }
