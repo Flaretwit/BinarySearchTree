@@ -1,7 +1,8 @@
 #include <iostream>
 
-#ifndef BinaryNODE_H
-#define Bino9
+#ifndef BINARYNODE_h
+#define BINARYNODE_h
+class BinaryNode {
  public:
   BinaryNode(int newValue);
   BinaryNode();
@@ -12,9 +13,10 @@
   void setRight(BinaryNode* newRight);
   int getValue();
   void setValue(int newvalue);
- private:
   BinaryNode* left;
   BinaryNode* right;
+ private:
+
   int value;
 };
 

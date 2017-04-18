@@ -9,8 +9,13 @@ BinaryNode::BinaryNode(){
   right = NULL;
 }
 //intializes the note with a value
-BinaryNode::~BinaryNode(int newValue){
-  value = newValue
+BinaryNode::BinaryNode(int newValue){
+  value = newValue;
+  left = NULL;
+  right = NULL;
+}
+
+BinaryNode::~BinaryNode() {
   left = NULL;
   right = NULL;
 }
