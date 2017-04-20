@@ -1,15 +1,23 @@
-#include <iostream>
+//Binary Search Tree.
+//Implementation allows the addition and removal of Nodes containing integers into the BST
+//There is also a function that prints the tree.
 
+#define ADD 1
+#define REMOVE 2
+#define PRINT 3
+#define EXIT 4
+
+#include <iostream>
 #include <string.h>
-#include <stack>
 #include "BinaryNode.h"
 #include <cstring>
 #include <algorithm>
 
 void insert(int value, BinaryNode *& root);
 void removeNode(int number, BinaryNode *& root);
-int getDepth(int number, BinaryNode* root);
+int getDepth(int level, int number, BinaryNode* root);
 void printTree(BinaryNode* current, BinaryNode* root);
+int parseCommand(char *input);
 
 using namespace std;
 
@@ -31,6 +39,8 @@ int main() {
       //or null terminator
       strncat(token, &array[i], 1);
     }
+    //if the array is found to be a space or null terminator,
+    //then the token is converted to an integer and inserted into the BST
     else {
       if(token[0] != ' ' && token[0] != '\0') {
         int temp = atoi(token);
@@ -40,28 +50,58 @@ int main() {
       }
     }
   }
-  cout << "array" << array << endl;
-  cout << "root value" << root->getValue() << endl;
-//  inorder(root);
 
-  printTree(root, root);
-
+  char input[80];
+  bool done = false;
+  while(!done) {
+    cout << "ADD, REMOVE, OR PRINT, OR EXIT?" << endl;
+    cin >> input;
+    switch(parseCommand(input)) {
+      case ADD: {
+        char temp[80];
+        cout << "Enter an integer: " << flush;
+        cin >> temp;
+        int num = atoi(temp);
+        insert(num, root);
+        break;
+      }
+      case PRINT:
+        printTree(root, root);
+        break;
+      case REMOVE: {
+        char temp[80];
+        cout << "What number to remove from the BST?" << endl;
+        cin >> temp;
+        int num = atoi(temp);
+        removeNode(num, root);
+        break;
+      }
+      case EXIT:
+        done = true;
+        break;
+    }
+  }
   return 0;
 }
 
-void printTree(BinaryNode* current, BinaryNode *root) {
-    if (root != NULL)
-    {
-        printTree(root->getRight(), root);
-        int num = getDepth(current->getValue(), root);
-        cout << "HEIGHT" << num << flush;
-        for(int i = 0; i < num; i++) {
-          cout << "\t" << flush;
-        }
-        cout << current->getValue() << endl;
-        printTree(root->getLeft(), root);
-    }
+void printTree(BinaryNode* node, BinaryNode* root)
+{
+     if (node == NULL)
+          return;
+     /* first recur on right child */
+     printTree(node->right, root);
+
+     int num = getDepth(0, node->getValue(), root);
+     for(int i = 0; i < num; i++) {
+       cout << "\t" << flush;
+     }
+     /* then print the data of the node */
+     cout << " " << node->getValue() << endl;
+
+     /* now recur on left child */
+     printTree(node->left, root);
 }
+
 
 //inserts a node into the Binary Search Tree, maintaining order.
 void insert(int value, BinaryNode*& root) {
@@ -99,16 +139,16 @@ void insert(int value, BinaryNode*& root) {
   }
 }
 //removes a node by value in the Binary Search Tree.
-void removeNode(int number, BinaryNode * root) {
+void removeNode(int number, BinaryNode *& root) {
   //if current node has value equal to value, deal with removing the Node.
-  if(root = NULL) {
+  if(root == NULL) {
     return;
   }
   else if(number < root->getValue()) {
-    removeNode(number, root->getLeft());
+    removeNode(number, root->left);
   }
   else if(number > root->getValue()) {
-    removeNode(number, root->getRight());
+    removeNode(number, root->right);
   }
   //then perform upshift operations
   else if(number == root->getValue()) {
@@ -122,26 +162,51 @@ void removeNode(int number, BinaryNode * root) {
       int tempValue = root->getValue();
       root->setValue(root->getRight()->getValue());
       root->getRight()->setValue(tempValue);
-      removeNode(number, root->getRight());
+      removeNode(number, root->right);
     }
     //if there is a left child but no right
     else if(root->getRight() == NULL) {
       int tempValue = root->getValue();
       root->setValue(root->getLeft()->getValue());
       root->getLeft()->setValue(root->getValue());
-      removeNode(number, root->getLeft());
+      removeNode(number, root->left);
     }
   }
 }
 
-int getDepth(int number, BinaryNode* root) {
-  if(root->getValue() == number) {
+int getDepth(int level, int number, BinaryNode* root) {
+  if(root == NULL) {
     return 0;
   }
-  else if(number < root->getValue()) {
-    return 1 + getDepth(number, root->getLeft());
+  else if(root->getValue() == number) {
+    return level;
   }
-  else if(number > root->getValue()) {
-    return 1 + getDepth(number, root->getRight());
+  int downLevel = getDepth(level + 1, number, root->getLeft());
+  if(downLevel != 0) {
+    return downLevel;
   }
+  downLevel = getDepth(level + 1, number, root->getRight());
+  return downLevel;
+}
+
+//compares the input to known commands
+int parseCommand(char *input) {
+  for(int i = 0; i < strlen(input); i++) {
+		input[i] = toupper(input[i]);
+	}
+	if(!strcmp(input, "ADD")) {
+		return ADD;
+	}
+	else if(!strcmp(input, "PRINT")) {
+		return PRINT;
+	}
+	else if(!strcmp(input, "REMOVE")) {
+		return REMOVE;
+	}
+	else if(!strcmp(input, "EXIT")) {
+		return EXIT;
+	}
+	else {
+		return 0;
+	}
 }
