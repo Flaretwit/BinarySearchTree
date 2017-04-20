@@ -141,7 +141,7 @@ BinaryNode* findMin(BinaryNode* root) {
   }
   return root;
 }
-//removes a node by value in the Binary Search Tree.
+//removes a node by value in the Binary Search Tree... completely recursively!
 BinaryNode* removeNode(int value, BinaryNode *& root) {
   //if root is NULL e.g. tree is empty, exit immediately
   if(root == NULL) {
@@ -172,6 +172,9 @@ BinaryNode* removeNode(int value, BinaryNode *& root) {
     }
     //Case 3: Two children
     else {
+      //first copy the value of the minimum node that was larger than the node to be deleted
+      //then perform a delete operation on that minimum node
+      //because we made sure it only had a maximum of 1 child, deleting it will be simple
       BinaryNode* temp = findMin(root->right);
       root->value = temp->value;
       root->right = removeNode(temp->value, root->right);
@@ -179,7 +182,7 @@ BinaryNode* removeNode(int value, BinaryNode *& root) {
   }
   return root;
 }
-
+//gets depth of a particular number in the BST
 int getDepth(int level, int number, BinaryNode* root) {
   if(root == NULL) {
     return 0;
