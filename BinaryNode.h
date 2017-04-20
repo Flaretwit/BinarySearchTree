@@ -15,8 +15,7 @@ class BinaryNode {
   void setValue(int newvalue);
   BinaryNode* left;
   BinaryNode* right;
- private:
-
+  BinaryNode* parent;
   int value;
 };
 

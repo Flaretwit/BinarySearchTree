@@ -14,11 +14,11 @@
 #include <algorithm>
 
 void insert(int value, BinaryNode *& root);
-void removeNode(int number, BinaryNode *& root);
+BinaryNode* removeNode(int value, BinaryNode *& root);
 int getDepth(int level, int number, BinaryNode* root);
 void printTree(BinaryNode* current, BinaryNode* root);
 int parseCommand(char *input);
-
+BinaryNode* findMin(BinaryNode* root);
 using namespace std;
 
 int main() {
@@ -45,7 +45,6 @@ int main() {
       if(token[0] != ' ' && token[0] != '\0') {
         int temp = atoi(token);
         token[0] = '\0';
-        cout << "temp " << temp << endl;
         insert(temp, root);
       }
     }
@@ -105,15 +104,13 @@ void printTree(BinaryNode* node, BinaryNode* root)
 
 //inserts a node into the Binary Search Tree, maintaining order.
 void insert(int value, BinaryNode*& root) {
-    cout << "Looping" << endl;
   if(root == NULL) {
       BinaryNode* node = new BinaryNode(value);
       root = node;
-      cout << "finalized" << endl;
       return;
   }
   else if(value < root->getValue()) {
-    //Root has no right child
+    //Root has no right childb
      if(root->getLeft() == NULL){
         BinaryNode* newNode = new BinaryNode();
         newNode->setValue(value);
@@ -122,7 +119,6 @@ void insert(int value, BinaryNode*& root) {
      else {
        BinaryNode* temp = root->getLeft();
        insert(value, temp);
-       cout << "went to left" << endl;
      }
   }
   else if(value >= root->getValue()) {
@@ -134,44 +130,54 @@ void insert(int value, BinaryNode*& root) {
     else {
       BinaryNode* temp = root->getRight();
       insert(value, temp);
-      cout << "went to right" << endl;
     }
   }
 }
+
+//finds minimum node greater than the current node (for two children node deletion)
+BinaryNode* findMin(BinaryNode* root) {
+  while(root->left != NULL) {
+    root = root->left;
+  }
+  return root;
+}
 //removes a node by value in the Binary Search Tree.
-void removeNode(int number, BinaryNode *& root) {
-  //if current node has value equal to value, deal with removing the Node.
+BinaryNode* removeNode(int value, BinaryNode *& root) {
+  //if root is NULL e.g. tree is empty, exit immediately
   if(root == NULL) {
-    return;
+    return root;
   }
-  else if(number < root->getValue()) {
-    removeNode(number, root->left);
+  else if(value < root->value) {
+    root->left = removeNode(value, root->left);
   }
-  else if(number > root->getValue()) {
-    removeNode(number, root->right);
+  else if(value > root->value) {
+    root->right = removeNode(value, root->right);
   }
-  //then perform upshift operations
-  else if(number == root->getValue()) {
-    //if the no left or right child
-    if(root->getLeft() == NULL && root->getRight() == NULL) {
-      delete root;
-      root = NULL;
+  else {
+    //Case 1: No child
+    if(root->left == NULL && root->right == NULL) {
+        delete root;
+        root = NULL;
     }
-    //if there is a left and right child or just a right child
-    else if(root->getRight() != NULL) {
-      int tempValue = root->getValue();
-      root->setValue(root->getRight()->getValue());
-      root->getRight()->setValue(tempValue);
-      removeNode(number, root->right);
+    //Case 2: One child
+    else if(root->left == NULL) {
+      BinaryNode* temp = root;
+      root = root->right;
+      delete temp;
     }
-    //if there is a left child but no right
-    else if(root->getRight() == NULL) {
-      int tempValue = root->getValue();
-      root->setValue(root->getLeft()->getValue());
-      root->getLeft()->setValue(root->getValue());
-      removeNode(number, root->left);
+    else if(root->right == NULL) {
+      BinaryNode* temp = root;
+      root = root->left;
+      delete temp;
+    }
+    //Case 3: Two children
+    else {
+      BinaryNode* temp = findMin(root->right);
+      root->value = temp->value;
+      root->right = removeNode(temp->value, root->right);
     }
   }
+  return root;
 }
 
 int getDepth(int level, int number, BinaryNode* root) {
